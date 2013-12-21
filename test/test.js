@@ -129,8 +129,8 @@ asyncTest('Dynamic response status callback', function() {
         data: {
             response: 'Hello world'
         },
-        error: function(){
-            ok(true, "error callback was called");
+        error: function(){ 
+            ok(true, "error callback was called"); 
         },
         complete: function(xhr) {
             equals(xhr.status, 500, 'Dynamically set response status matches');
@@ -251,60 +251,6 @@ asyncTest('Disable console logging', function() {
     });
 });
 
-asyncTest('Get mocked ajax calls', function() {
-    $.mockjaxClear();
-    $.mockjax({
-        url: '/api/example/*'
-    });
-    equals($.mockjax.mockedAjaxCalls().length, 0, 'Initially there are no saved ajax calls')
-    // GET
-    $.ajax({
-        async: false,
-        type: 'GET',
-        url: '/api/example/1',
-        complete: function() {
-            var actualCalls = $.mockjax.mockedAjaxCalls();
-            equals(actualCalls.length, 1, 'One mocked ajax call is saved');
-            equals(actualCalls[0].type, 'GET', 'Saved ajax call has expected method');
-            equals(actualCalls[0].url, '/api/example/1', 'Saved ajax call has expected url');
-            start();
-        }
-    });
-    // POST with some data
-    $.ajax({
-        async: false,
-        type: 'POST',
-        url: '/api/example/2',
-        data: {a: 1},
-        complete: function() {
-            var actualCalls = $.mockjax.mockedAjaxCalls();
-            equals(actualCalls.length, 2, 'Two mocked ajax calls are saved');
-            equals(actualCalls[1].type, 'POST', 'Second ajax call has expected method');
-            equals(actualCalls[1].url, '/api/example/2', 'Second ajax call has expected url');
-            deepEqual(actualCalls[1].data, {a: 1}, 'Second ajax call has expected data');
-            start();
-        }
-    });
-    // JSONP
-    $.ajax({
-        async: false,
-        url: '/api/example/jsonp?callback=?',
-        jsonpCallback: 'foo123',
-        dataType: 'jsonp',
-        complete: function() {
-            var actualCalls = $.mockjax.mockedAjaxCalls();
-            equals(actualCalls.length, 3, 'Three mocked ajax calls are saved');
-            equals(actualCalls[2].url, '/api/example/jsonp?callback=foo123', 'Third ajax call has expected jsonp url');
-            start();
-        }
-    });
-    equals($.mockjax.mockedAjaxCalls().length, 3, 'Afterwords there should be three saved ajax calls')
-    var mockedUrls = $.map($.mockjax.mockedAjaxCalls(), function(ajaxOptions) { return ajaxOptions.url })
-    deepEqual(mockedUrls, ['/api/example/1', '/api/example/2', '/api/example/jsonp?callback=foo123'], 'Mocked ajax calls are saved in execution order')
-    $.mockjaxClear();
-    equals($.mockjax.mockedAjaxCalls().length, 0, 'After clearing there are no saved ajax calls')
-});
-
 // These tests is only relevant in 1.5.2 and higher
 if( jQuery.Deferred ) {
     asyncTest('Preserve context when set in jsonp ajax requet', function(){
@@ -329,7 +275,7 @@ if( jQuery.Deferred ) {
                 });
             $.mockjaxClear();
     });
-
+    
     asyncTest('Validate this is the $.ajax object if context is not set', function(){
             $.mockjax({
                     url: '/jsonp*',
@@ -616,36 +562,6 @@ asyncTest('Multiple data matching requests', function() {
         dataType: 'json',
         success: function(resp) {
             deepEqual( resp, {"yes?": "yes"}, "correct mock hander" );
-        },
-        complete: function(xhr) {
-            start();
-        }
-    });
-
-    $.mockjaxClear();
-});
-
-// Test to prove issue #106
-asyncTest('Null matching on request', 1, function() {
-    $.mockjax({
-        url: '/response-callback',
-        contentType: 'text/json',
-        data: {
-            foo: 'bar',
-            bar: null
-        },
-        responseText: {}
-    });
-
-    $.ajax({
-        url: '/response-callback',
-        error: noErrorCallbackExpected,
-        data: {
-            foo: 'bar',
-            bar: null
-        },
-        success: function(json) {
-            ok( true, "Successfully matched data that contained null values" );
         },
         complete: function(xhr) {
             start();
@@ -1065,7 +981,7 @@ asyncTest('Dynamic mock definition', function() {
     $.mockjax( function( settings ) {
         var service = settings.url.match(/\/users\/(.*)$/);
         if ( service ) {
-            return {
+            return { 
                 proxy: 'test_proxy.json'
             }
         }
@@ -1163,29 +1079,6 @@ asyncTest("Preserve responseText inside a response function when using jsonp and
 
     $.mockjaxClear();
 });
-
-asyncTest('Custom status when using proxy', function() {
-    $.mockjax({
-        url: '/response-callback',
-        status: 409,
-        proxy: 'test_proxy.json'
-    });
-
-    $.ajax({
-        url: '/response-callback',
-        error: function(){ ok(true, "error callback was called"); },
-        success: function(json) {
-            ok( false, "Success should not be called" );
-        },
-        complete: function(xhr) {
-            equals(xhr.status, 409, 'response status matches');
-            start();
-        }
-    });
-
-    $.mockjaxClear();
-});
-
 /*
 var id = $.mockjax({
    ...
