@@ -63,7 +63,7 @@
 			// Querystring may be a regex
 			return $.isFunction( mock.test ) ? mock.test(live) : mock == live;
 		}
-		$.each(mock, function(k) {
+		$.each(live, function(k) {
 			if ( live[k] === undefined ) {
 				identical = false;
 				return identical;
