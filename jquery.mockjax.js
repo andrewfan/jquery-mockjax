@@ -64,7 +64,7 @@
 			return $.isFunction( mock.test ) ? mock.test(live) : mock == live;
 		}
 		$.each(live, function(k) {
-			if ( live[k] === undefined ) {
+			if ( mock[k] === undefined ) {
 				identical = false;
 				return identical;
 			} else {
